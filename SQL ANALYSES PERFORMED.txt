@@ -1,0 +1,162 @@
+-- SQL ANALYSES PERFORMED FOR FINDING THE ROOT CAUSE BEHIND DELIVERY DELAYS 
+-- 1. Total Delivery Delay Identification
+SELECT
+    o.order_id,
+    o.order_datetime,
+    o.promised_datetime,
+    d.delivery_datetime,
+    EXTRACT(EPOCH FROM (d.delivery_datetime - o.promised_datetime)) / 60 
+        AS delay_minutes
+FROM orders AS o
+JOIN delivery_details AS d
+    ON o.order_id = d.order_id
+WHERE d.delivery_datetime > o.promised_datetime
+ORDER BY delay_minutes DESC;
+
+-- 2. Delay-Prone Regions
+SELECT
+    c.city,
+    ROUND(
+        AVG(
+            EXTRACT(EPOCH FROM (dl.delivery_datetime - o.order_datetime)) / 60
+        ), 2
+    ) AS avg_delivery_time_minutes
+FROM orders o
+JOIN customers c
+    ON o.customer_id = c.customer_id
+JOIN delivery_details dl
+    ON o.order_id = dl.order_id
+GROUP BY c.city
+ORDER BY avg_delivery_time_minutes DESC;
+
+-- 3. Rider Performance Analysis
+SELECT
+    r.rider_id,
+    r.rider_name,
+    COUNT(ds.order_id) AS total_orders,
+    ROUND(
+        AVG(
+            EXTRACT(EPOCH FROM (dl.delivery_datetime - ds.dispatch_datetime)) / 60
+        ), 2
+    ) AS avg_delivery_time_minutes,
+    r.rating
+FROM rider_info AS r
+JOIN dispatch_details AS ds
+    ON r.rider_id = ds.rider_id
+JOIN delivery_details AS dl
+    ON ds.order_id = dl.order_id
+GROUP BY r.rider_id, r.rider_name, r.rating
+ORDER BY avg_delivery_time_minutes DESC;
+
+-- 4. Preparation Delay at Restaurants/Warehouses
+SELECT
+    res.restaurant_id,
+    res.name AS restaurant_name,
+    res.avg_preparation_time,
+    ROUND(
+        AVG(
+            EXTRACT(EPOCH FROM (ds.dispatch_datetime - o.order_datetime)) / 60
+        ), 2
+    ) AS actual_prep_time
+FROM orders o
+JOIN restaurants res
+    ON o.restaurant_id = res.restaurant_id
+JOIN dispatch_details ds
+    ON o.order_id = ds.order_id
+GROUP BY res.restaurant_id, res.name, res.avg_preparation_time
+HAVING
+    AVG(EXTRACT(EPOCH FROM (ds.dispatch_datetime - o.order_datetime)) / 60)
+    > res.avg_preparation_time
+ORDER BY actual_prep_time DESC;
+
+-- 5. Distance-Based Delays
+SELECT
+    CASE
+        WHEN o.distance_km <= 3 THEN '0–3 km'
+        WHEN o.distance_km <= 6 THEN '3–6 km'
+        WHEN o.distance_km <= 10 THEN '6–10 km'
+        ELSE '10+ km'
+    END AS distance_bucket,
+
+    ROUND(
+        AVG(
+            EXTRACT(EPOCH FROM (dl.delivery_datetime - ds.dispatch_datetime)) / 60
+        ), 2
+    ) AS avg_delivery_time_minutes
+FROM orders AS o
+JOIN dispatch_details AS ds
+    ON o.order_id = ds.order_id
+JOIN delivery_details AS dl
+    ON o.order_id = dl.order_id
+GROUP BY distance_bucket
+ORDER BY avg_delivery_time_minutes DESC;
+
+-- 6. Peak Hour Delay Trends
+SELECT
+    EXTRACT(HOUR FROM o.order_datetime) AS order_hour,
+    ROUND(
+        AVG(
+            EXTRACT(EPOCH FROM (dl.delivery_datetime - o.order_datetime)) / 60
+        ), 2
+    ) AS avg_delivery_time_minutes
+FROM orders AS o
+JOIN delivery_details AS dl
+    ON o.order_id = dl.order_id
+GROUP BY order_hour
+ORDER BY order_hour;
+
+-- 7. Combined Delay Drivers
+WITH delay_breakdown AS (
+
+    SELECT
+        o.order_id,
+
+        EXTRACT(EPOCH FROM (ds.dispatch_datetime - o.order_datetime)) / 60
+            AS preparation_delay,
+
+        EXTRACT(EPOCH FROM (dl.delivery_datetime - ds.dispatch_datetime)) / 60
+            AS rider_delay,
+
+        CASE 
+            WHEN o.distance_km > 8 THEN 
+                EXTRACT(EPOCH FROM (dl.delivery_datetime - o.order_datetime)) / 60
+            ELSE 0
+        END AS distance_delay,
+
+        CASE
+            WHEN EXTRACT(HOUR FROM o.order_datetime) BETWEEN 12 AND 14
+              OR EXTRACT(HOUR FROM o.order_datetime) BETWEEN 19 AND 21
+            THEN EXTRACT(EPOCH FROM (dl.delivery_datetime - o.order_datetime)) / 60
+            ELSE 0
+        END AS peak_hour_delay
+
+    FROM orders o
+    JOIN dispatch_details ds ON o.order_id = ds.order_id
+    JOIN delivery_details dl ON o.order_id = dl.order_id
+)
+
+SELECT
+    'Preparation Delay' AS delay_type,
+    ROUND(AVG(preparation_delay), 2) AS avg_delay_minutes
+FROM delay_breakdown
+
+UNION ALL
+
+SELECT
+    'Rider Delay',
+    ROUND(AVG(rider_delay), 2)
+FROM delay_breakdown
+
+UNION ALL
+
+SELECT
+    'Distance Delay',
+    ROUND(AVG(distance_delay), 2)
+FROM delay_breakdown
+
+UNION ALL
+
+SELECT
+    'Peak Hour Delay',
+    ROUND(AVG(peak_hour_delay), 2)
+FROM delay_breakdown;

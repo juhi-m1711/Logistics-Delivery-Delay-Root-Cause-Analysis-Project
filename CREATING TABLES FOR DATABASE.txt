@@ -1,0 +1,60 @@
+-- CREATING TABLES FOR LOGISTICS DATABASE
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    city VARCHAR(50)
+);
+
+CREATE TABLE restaurants (
+    restaurant_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    city VARCHAR(50),
+    avg_preparation_time INT  -- in minutes
+);
+
+CREATE TABLE rider_info (
+    rider_id INT PRIMARY KEY,
+    rider_name VARCHAR(100),
+    city VARCHAR(50),
+	experience_months INT,
+	rating decimal(3,2)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    restaurant_id INT,
+    order_datetime TIMESTAMP,
+	promised_date
+    distance_km DECIMAL(5,2),
+
+    CONSTRAINT fk_customer
+        FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+
+    CONSTRAINT fk_restaurant
+        FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
+);
+
+CREATE TABLE dispatch_details (
+    dispatch_id INT PRIMARY KEY,
+    order_id INT,
+    rider_id INT,
+    dispatch_datetime TIMESTAMP,
+
+    CONSTRAINT fk_order_dispatch
+        FOREIGN KEY (order_id) REFERENCES orders(order_id),
+
+    CONSTRAINT fk_rider
+        FOREIGN KEY (rider_id) REFERENCES rider_info(rider_id)
+);
+
+CREATE TABLE delivery_details (
+    delivery_id INT PRIMARY KEY,
+    order_id INT,
+    delivery_datetime TIMESTAMP,
+    delivery_status VARCHAR(20),
+
+    CONSTRAINT fk_order_delivery
+        FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
