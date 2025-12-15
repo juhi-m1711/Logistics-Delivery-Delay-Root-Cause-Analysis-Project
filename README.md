@@ -103,6 +103,7 @@ Hi, I’m **Juhi Moudekar**, a data analytics learner passionate about using dat
 This project represents my **first step into applied SQL analytics**, and I’m continuously improving it as I learn more.
 
 🔗 Connect with me on LinkedIn  
+www.linkedin.com/in/juhi-moudekar
 
 ---
 
