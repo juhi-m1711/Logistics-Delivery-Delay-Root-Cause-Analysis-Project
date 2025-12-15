@@ -2,7 +2,7 @@
 
 ## 📌 Project Overview
 This is my **first end-to-end SQL analytics project**, focused on analyzing **delivery delays in a logistics / food-delivery system**.  
-The goal of the project is to identify **where and why delivery delays occur** and propose **data-backed solutions** that platforms like Swiggy, Zomato, or Amazon Logistics could use to improve delivery performance.
+The goal of the project is to identify **where and why delivery delays occur** and propose **data-backed solutions**.
 
 The project uses **simulated, public-style operational data** modeled on real-world delivery platforms.
 
