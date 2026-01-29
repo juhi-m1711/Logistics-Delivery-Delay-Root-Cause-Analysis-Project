@@ -1,6 +1,6 @@
 # 📦 Logistics: Delivery Delay Root Cause Analysis (SQL Project)
 
-## 📌 Project Overview
+## Project Overview
 This is my **first end-to-end SQL analytics project**, focused on analyzing **delivery delays in a logistics / food-delivery system**.  
 The goal of the project is to identify **where and why delivery delays occur** and propose **data-backed solutions**.
 
@@ -8,7 +8,7 @@ The project uses **simulated, public-style operational data** modeled on real-wo
 
 ---
 
-## 🎯 Business Problem
+## Business Problem
 Late deliveries negatively impact:
 - Customer satisfaction
 - Platform ratings
@@ -22,7 +22,7 @@ This project answers key questions such as:
 
 ---
 
-## 🧠 Analysis Approach
+## Analysis Approach
 I performed a structured SQL-based analysis covering:
 - Order → Dispatch → Delivery time breakdown
 - Delay calculation vs promised delivery time
@@ -35,7 +35,7 @@ Each analysis directly maps to a **business problem and a proposed solution**.
 
 ---
 
-## 🗂️ Dataset Description
+## Dataset Description
 - **Data Type:** Simulated / public-style operational logistics data  
 - **Tables Used:**
   - `orders`
@@ -52,11 +52,11 @@ Each analysis directly maps to a **business problem and a proposed solution**.
   - `distance_km`
 - **Time Range:** Multi-month operational data
 
-⚠️ *Note: This is not real company data and is used purely for learning and demonstration purposes.*
+ *Note: This is not real company data and is used purely for learning and demonstration purposes.*
 
 ---
 
-## 🛠️ Tools & Technologies
+## Tools & Technologies
 - **Database:** PostgreSQL  
 - **SQL Concepts Used:**
   - JOINs
@@ -69,7 +69,7 @@ Each analysis directly maps to a **business problem and a proposed solution**.
 
 ---
 
-## 📊 Key Insights
+## Key Insights
 - Peak hours (lunch & dinner) show the highest delivery delays
 - Restaurant preparation delays significantly impact overall delivery time
 - High rider workload correlates with increased delivery delays
@@ -77,7 +77,7 @@ Each analysis directly maps to a **business problem and a proposed solution**.
 
 ---
 
-## 🚀 Proposed Solutions
+## Proposed Solutions
 - Delay prediction before order confirmation (dynamic ETA)
 - Peak-hour rider surge planning
 - Restaurant SLA monitoring & penalties
@@ -86,7 +86,7 @@ Each analysis directly maps to a **business problem and a proposed solution**.
 
 ---
 
-## 🔮 Future Scope
+## Future Scope
 - Apply **machine learning models** to predict delays in real time  
 - Use **time-series forecasting** for rider demand planning  
 - Introduce **real-time dashboards** for operations teams  
@@ -97,7 +97,7 @@ Each analysis directly maps to a **business problem and a proposed solution**.
 
 ---
 
-## 🙋‍♀️ About Me
+## About Me
 Hi, I’m **Juhi Moudekar**, a data analytics learner passionate about using data to solve real-world business problems.
 
 This project represents my **first step into applied SQL analytics**, and I’m continuously improving it as I learn more.
